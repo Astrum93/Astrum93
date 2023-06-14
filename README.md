@@ -7,7 +7,7 @@
 
 <img src="https://img.shields.io/badge/Tstory-E34F26?style=flat&logo=tistory&logoColor=white" /> [NA Blog](https://astrum93.tistory.com/)
 	
-<img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white" /> [Portpolio](https://www.notion.so/astrum93/4cafb9bffadd41aab36297dd738f9e13)
+<img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white" /> [Portpolio](https://astrum93.notion.site/4cafb9bffadd41aab36297dd738f9e13?pvs=4)
 
 </div>
 
