@@ -1,6 +1,6 @@
 <div align="center" width:300px;>
 
-![header](https://capsule-render.vercel.app/api?type=waving&color=timeGradient&height=200&section=header&text=Hello%20NA%20World&fontSize=70&animation=twinkling)
+![header](https://capsule-render.vercel.app/api?type=waving&color=timeGradient&height=200&section=header&text=NA의%20일지&fontSize=70&animation=twinkling)
 
 ---
 ## Link
