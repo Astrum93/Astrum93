@@ -71,20 +71,8 @@
 <hr>
 
 <div align=center>
-  
-[![Anurag's GitHub stats](https://github-readme-stats.vercel.app/api?username=Astrum93)](https://github.com/Astrum93/github-readme-stats) 
-  
-[![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=Astrum93)](https://github.com/Astrum93/github-readme-stats)
+	
+[![Github](https://www.codenary.co.kr/widget/github/api?username=나정민)](https://www.codenary.co.kr/user-profile/detail/나정민?github_ride=true&utm_source=github)
   
 </div>
 
----
-<div align=center>
-<h3>Baekjoon Rank</h3>
-<hr>
-
-[![Solved.ac
-프로필](http://mazassumnida.wtf/api/generate_badge?boj=min2670)](https://solved.ac/min2670)
-  
-</div>
-####
