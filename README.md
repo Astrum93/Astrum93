@@ -5,7 +5,7 @@
 ---
 ## Link
 
-<img src="https://img.shields.io/badge/Tstory-E34F26?style=flat&logo=tistory&logoColor=white" /> [NA Blog](https://astrum93.tistory.com/)
+<img src="https://img.shields.io/badge/WordPress-21759B?style=flat&logo=wordpress&logoColor=white" /> [NA의 일지](https://spaceofna.com)
 	
 <img src="https://img.shields.io/badge/Notion-000000?style=flat&logo=notion&logoColor=white" /> [Portpolio](https://astrum93.notion.site/4cafb9bffadd41aab36297dd738f9e13?pvs=4)
 
