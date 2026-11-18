@@ -532,28 +532,37 @@ STORE_GLYPH = {
 }
 
 
-def store_item(name, icon_file, app, sub, store, last=False):
-    h = 64
+def store_row(name, icon_file, app, sub, store, half, last=False, sep=False):
+    """앱 하나 = 두 줄 블록. 윗줄(half=0)은 App Store, 아랫줄(half=1)은 Google Play 링크.
+    아이콘·앱 이름은 두 줄에 걸쳐 한 번만 보이도록, 각 줄이 자기 몫(위/아래 절반)만 그린다.
+    (줄 사이 틈이 0이라 이어 붙이면 하나로 보이고, 모든 줄이 통이미지라 모바일에서도 안전하다)"""
+    h = 54
+    oy = -h * half                      # 블록 좌표 → 이 줄 좌표
     label, color_key, glyph = STORE_GLYPH[store]
     color = C[color_key]
-    defs = f'<clipPath id="ic"><rect x="20" y="12" width="40" height="40" rx="10"/></clipPath>'
-    body = (list_shape(h, False, last) +
-            f'<line x1="74" y1="0.5" x2="{W-1}" y2="0.5" stroke="{C["border"]}"/>'
-            f'<image x="20" y="12" width="40" height="40" clip-path="url(#ic)" href="{b64png(os.path.join(STORE_DIR, icon_file))}"/>'
-            f'<text x="74" y="29" font-size="14.5" class="t b">{app}</text>'
-            f'<text x="74" y="48" font-size="12" class="s">{sub}</text>'
-            f'<rect x="{W-150}" y="16" width="112" height="32" rx="16" fill="{color}" fill-opacity="0.14"/>'
-            f'<g transform="translate({W-130} 32) scale(0.8)" stroke="{color}">{glyph}</g>'
-            f'<text x="{W-117}" y="36.5" font-size="12" fill="{color}" font-weight="700">{label}</text>'
-            f'<path d="M{W-24} 26 l6 6 l-6 6" fill="none" stroke="{C["faint"]}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>')
+    icon_y = 26 + oy
+    defs = f'<clipPath id="ic"><rect x="20" y="{icon_y}" width="56" height="56" rx="14"/></clipPath>'
+    body = list_shape(h, False, last)
+    if sep:
+        body += f'<line x1="20" y1="0.5" x2="{W-20}" y2="0.5" stroke="{C["border"]}"/>'
+    body += (f'<image x="20" y="{icon_y}" width="56" height="56" clip-path="url(#ic)" '
+             f'href="{b64png(os.path.join(STORE_DIR, icon_file))}"/>'
+             f'<text x="90" y="{50 + oy}" font-size="15.5" class="t b">{app}</text>'
+             f'<text x="90" y="{72 + oy}" font-size="12" class="s">{sub}</text>'
+             # 오른쪽: 이 줄의 스토어 버튼
+             f'<rect x="{W-156}" y="11" width="136" height="32" rx="16" fill="{color}" fill-opacity="0.14" '
+             f'stroke="{color}" stroke-opacity="0.35"/>'
+             f'<g transform="translate({W-134} 27) scale(0.8)" stroke="{color}">{glyph}</g>'
+             f'<text x="{W-120}" y="31.5" font-size="12.5" fill="{color}" font-weight="700">{label}</text>'
+             f'<path d="M{W-34} 22 l5 5 l-5 5" fill="none" stroke="{color}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>')
     write(name, svg(h, body, defs), pad=(0, 6 if last else 0))
 
 
 store_head()
-store_item("store-user-ios.svg", "user.png", "써젯", "유저앱 · 타임딜 구매", "ios")
-store_item("store-user-play.svg", "user.png", "써젯", "유저앱 · 타임딜 구매", "play")
-store_item("store-partner-ios.svg", "partner.png", "써젯 사장님용", "점주앱 · 티켓 확인 · 정산", "ios")
-store_item("store-partner-play.svg", "partner.png", "써젯 사장님용", "점주앱 · 티켓 확인 · 정산", "play", last=True)
+store_row("store-user-ios.svg", "user.png", "써젯", "유저앱 · 타임딜 구매", "ios", 0)
+store_row("store-user-play.svg", "user.png", "써젯", "유저앱 · 타임딜 구매", "play", 1)
+store_row("store-partner-ios.svg", "partner.png", "써젯 사장님용", "점주앱 · 티켓 확인 · 정산", "ios", 0, sep=True)
+store_row("store-partner-play.svg", "partner.png", "써젯 사장님용", "점주앱 · 티켓 확인 · 정산", "play", 1, last=True)
 
 # 7-3. 정보처리기사 위젯 --------------------------------------------------------
 h = 120
