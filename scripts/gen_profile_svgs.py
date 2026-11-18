@@ -1,6 +1,9 @@
 """Astrum93 프로필 README용 '앱 화면' SVG 생성기.
 
-사용법: python3 -I gen_profile_svgs.py <출력 폴더> <아바타 PNG> <스토어 아이콘 폴더(user.png, partner.png)>
+사용법: python3 -I gen_profile_svgs.py <출력 폴더> <아바타 PNG> <스토어 아이콘 폴더(user.png, partner.png)> [dark|light]
+  다크: python3 scripts/gen_profile_svgs.py assets scripts/src/avatar.png scripts/src dark
+  라이트: python3 scripts/gen_profile_svgs.py assets/light scripts/src/avatar.png scripts/src light
+  README는 <picture>로 GitHub 테마(라이트/다크)에 맞는 세트를 보여준다.
 (아바타는 SVG 안에 base64로 넣는다. README의 <img>로 띄운 SVG는 외부 이미지를 불러오지 못하기 때문)
 """
 import base64
@@ -13,11 +16,13 @@ with open(sys.argv[2], "rb") as f:
     AVATAR = "data:image/png;base64," + base64.b64encode(f.read()).decode()
 
 W = 420
-C = {
+THEME = sys.argv[4] if len(sys.argv) > 4 else "dark"
+DARK = {
     "bg": "#0F1218",
     "surface": "#161A22",
     "surface2": "#1E2330",
     "border": "#262C3A",
+    "notif": "#232838",
     "text": "#EEF0F6",
     "sub": "#98A1B3",
     "faint": "#5E677A",
@@ -29,6 +34,25 @@ C = {
     "red": "#F87171",
     "blue": "#60A5FA",
 }
+# GitHub 라이트 테마(흰 배경)에서 읽히도록 카드는 밝게, 강조색은 한 톤 진하게
+LIGHT = {
+    "bg": "#FFFFFF",
+    "surface": "#FFFFFF",
+    "surface2": "#F1F3F7",
+    "border": "#D0D7DE",
+    "notif": "#F6F8FA",
+    "text": "#1F2328",
+    "sub": "#59636E",
+    "faint": "#8C959F",
+    "purple": "#6D5BD0",
+    "teal": "#0F9488",
+    "pink": "#DB2777",
+    "amber": "#B45309",
+    "green": "#15803D",
+    "red": "#DC2626",
+    "blue": "#2563EB",
+}
+C = LIGHT if THEME == "light" else DARK
 FONT = ("Pretendard, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', "
         "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif")
 
@@ -477,7 +501,7 @@ body = f"""
 <g>
   <animateTransform attributeName="transform" type="translate" values="0 -60;0 -60;0 0" keyTimes="0;0.4;1" dur="1.2s" fill="freeze"/>
   <animate attributeName="opacity" values="0;0;1" keyTimes="0;0.4;1" dur="1.2s" fill="freeze"/>
-  <rect x="1" y="1" width="{W-2}" height="{h-2}" rx="22" fill="#232838" stroke="{C['border']}" stroke-width="1.5"/>
+  <rect x="1" y="1" width="{W-2}" height="{h-2}" rx="22" fill="{C['notif']}" stroke="{C['border']}" stroke-width="1.5"/>
   <rect x="16" y="18" width="40" height="40" rx="11" fill="url(#trophy)"/>
   <text x="36" y="45" font-size="20" text-anchor="middle">🏆</text>
   <text x="68" y="32" font-size="12" class="s" font-weight="600">수상 알림</text>
