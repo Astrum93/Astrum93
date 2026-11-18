@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="92" viewBox="0 0 420 92">
+<style>
+  text { font-family: Pretendard, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .t { fill: #EEF0F6; }
+  .s { fill: #98A1B3; }
+  .f { fill: #5E677A; }
+  .b { font-weight: 700; }
+
+</style>
+<defs><linearGradient id="trophy" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBBF24"/><stop offset="1" stop-color="#F97316"/></linearGradient></defs>
+
+<g>
+  <animateTransform attributeName="transform" type="translate" values="0 -60;0 -60;0 0" keyTimes="0;0.4;1" dur="1.2s" fill="freeze"/>
+  <animate attributeName="opacity" values="0;0;1" keyTimes="0;0.4;1" dur="1.2s" fill="freeze"/>
+  <rect x="1" y="1" width="418" height="90" rx="22" fill="#232838" stroke="#262C3A" stroke-width="1.5"/>
+  <rect x="16" y="18" width="40" height="40" rx="11" fill="url(#trophy)"/>
+  <text x="36" y="45" font-size="20" text-anchor="middle">🏆</text>
+  <text x="68" y="32" font-size="12" class="s" font-weight="600">수상 알림</text>
+  <text x="402" y="32" font-size="12" text-anchor="end" class="f">2023.07.08</text>
+  <text x="68" y="54" font-size="15" class="t b">BiG(Busan is Good) Data Hackathon</text>
+  <text x="68" y="75" font-size="13.5" fill="#FBBF24" font-weight="700">인기상 수상 🎉</text>
+</g>
+
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="112" viewBox="0 0 420 112">
+<style>
+  text { font-family: Pretendard, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .t { fill: #EEF0F6; }
+  .s { fill: #98A1B3; }
+  .f { fill: #5E677A; }
+  .b { font-weight: 700; }
+
+</style>
+<defs><linearGradient id="ig" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBBF24"/><stop offset="1" stop-color="#F97316"/></linearGradient></defs>
+<rect x="1" y="1" width="418" height="110" rx="20" fill="#161A22" stroke="#262C3A" stroke-width="1.5"/>
+<rect x="18" y="22" width="60" height="60" rx="16" fill="url(#ig)"/>
+<path d="M26 68 Q48 30 72 40" fill="none" stroke="#fff" stroke-opacity="0.55" stroke-width="2" stroke-dasharray="3 4"/><g><text font-size="20" fill="#fff" text-anchor="middle" dy="7">✈</text><animateMotion path="M26 68 Q48 30 72 40" dur="3s" repeatCount="indefinite" rotate="auto"/></g>
+<text x="92" y="36" font-size="17" class="t b">AirTicket</text>
+
+<text x="92" y="58" font-size="13" class="s">항공권 예매 · 클린 아키텍처 연습</text>
+<rect x="92" y="70" width="128" height="20" rx="10" fill="#60A5FA" fill-opacity="0.16" stroke="#60A5FA" stroke-opacity="0.45"/><text x="156.1" y="84" font-size="11" text-anchor="middle" fill="#60A5FA" font-weight="600">Clean Architecture</text><rect x="226.21999999999997" y="70" width="62" height="20" rx="10" fill="#2DD4BF" fill-opacity="0.16" stroke="#2DD4BF" stroke-opacity="0.45"/><text x="257.3" y="84" font-size="11" text-anchor="middle" fill="#2DD4BF" font-weight="600">Flutter</text>
+<path d="M394 48 l7 8 l-7 8" fill="none" stroke="#5E677A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+
+
+</svg>

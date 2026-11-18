@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="150" viewBox="0 0 420 150">
+<style>
+  text { font-family: Pretendard, 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+  .t { fill: #EEF0F6; }
+  .s { fill: #98A1B3; }
+  .f { fill: #5E677A; }
+  .b { font-weight: 700; }
+
+</style>
+<defs></defs>
+<rect x="1" y="1" width="418" height="148" rx="20" fill="#161A22" stroke="#262C3A" stroke-width="1.5"/>
+<text x="22" y="38" font-size="16.5" class="t b">✅ Todo Remix Collection</text>
+<text x="22" y="60" font-size="13" class="s">같은 Todo 앱을 7가지 방식으로 다시 만들어 봤어요</text>
+<rect x="22" y="76" width="45" height="20" rx="10" fill="#8B7CF6" fill-opacity="0.16" stroke="#8B7CF6" stroke-opacity="0.45"/><text x="44.4" y="90" font-size="11" text-anchor="middle" fill="#8B7CF6" font-weight="600">GetX</text><rect x="73.84" y="76" width="44" height="20" rx="10" fill="#60A5FA" fill-opacity="0.16" stroke="#60A5FA" stroke-opacity="0.45"/><text x="95.7" y="90" font-size="11" text-anchor="middle" fill="#60A5FA" font-weight="600">Bloc</text><rect x="124.58000000000001" y="76" width="50" height="20" rx="10" fill="#2DD4BF" fill-opacity="0.16" stroke="#2DD4BF" stroke-opacity="0.45"/><text x="149.5" y="90" font-size="11" text-anchor="middle" fill="#2DD4BF" font-weight="600">Cubit</text><rect x="181.48000000000002" y="76" width="68" height="20" rx="10" fill="#F472B6" fill-opacity="0.16" stroke="#F472B6" stroke-opacity="0.45"/><text x="215.7" y="90" font-size="11" text-anchor="middle" fill="#F472B6" font-weight="600">Riverpod</text><rect x="256.86" y="76" width="79" height="20" rx="10" fill="#FBBF24" fill-opacity="0.16" stroke="#FBBF24" stroke-opacity="0.45"/><text x="296.3" y="90" font-size="11" text-anchor="middle" fill="#FBBF24" font-weight="600">Local Data</text><rect x="22" y="102" width="88" height="20" rx="10" fill="#34D399" fill-opacity="0.16" stroke="#34D399" stroke-opacity="0.45"/><text x="66.2" y="116" font-size="11" text-anchor="middle" fill="#34D399" font-weight="600">Remote HTTP</text><rect x="117.39999999999999" y="102" width="98" height="20" rx="10" fill="#F87171" fill-opacity="0.16" stroke="#F87171" stroke-opacity="0.45"/><text x="166.2" y="116" font-size="11" text-anchor="middle" fill="#F87171" font-weight="600">Dart Frog 서버</text>
+<rect x="22" y="132" width="376" height="5" rx="2.5" fill="#1E2330"/>
+<rect x="22" y="132" width="0" height="5" rx="2.5" fill="#8B7CF6">
+  <animate attributeName="width" values="0;376;376" keyTimes="0;0.7;1" dur="4s" repeatCount="indefinite"/>
+</rect>
+
+</svg>
