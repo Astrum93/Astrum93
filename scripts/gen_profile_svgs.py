@@ -170,7 +170,7 @@ def write(name, content, kind="mid", pad=(6, 6)):
 h = 108
 body = f"""
 <rect x="160" y="6" width="100" height="30" rx="15" fill="#000"/>
-<text x="34" y="32" font-size="15" class="t b">9:41</text>
+<text x="34" y="32" font-size="15" class="t b">12:27</text>
 <g fill="{C['text']}">
   <rect x="318" y="26" width="3" height="6" rx="1"/><rect x="323" y="23" width="3" height="9" rx="1"/>
   <rect x="328" y="20" width="3" height="12" rx="1"/><rect x="333" y="17" width="3" height="15" rx="1"/>
