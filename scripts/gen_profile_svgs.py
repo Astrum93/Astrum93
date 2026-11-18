@@ -196,6 +196,14 @@ body = f"""
 """
 write("appbar.svg", svg(h, body), kind="top")
 
+# 배너의 "NOW CODING" 문구 (scripts/update_now_coding.py가 매일 갱신). 음파 그림(x=210~)과 겹치지 않게 자른다.
+_now_path = os.path.join(sys.argv[3], "now_coding.txt")
+NOW_CODING = open(_now_path, encoding="utf-8").read().strip() if os.path.exists(_now_path) else "music_is_life"
+while text_w(NOW_CODING, 15) * 1.08 > 180 and len(NOW_CODING) > 4:
+    NOW_CODING = NOW_CODING[:-2].rstrip() + "…"
+    NOW_CODING = NOW_CODING.replace("……", "…")
+NOW_CODING = NOW_CODING.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
 # 2. 프로필 -----------------------------------------------------------------
 h = 300
 lines = [
@@ -219,14 +227,27 @@ for i, line in enumerate(lines):
     else:
         kt = f"0;{a:.4f};{b:.4f};{c:.4f};{c+0.0001:.4f};1"
         vals = "0;0;300;300;0;0"
+    # 애니메이션을 지원하지 않는 렌더러(예: GitHub 모바일 앱)에서는 기본값이 그대로 보인다.
+    # 그래서 기본값은 "첫 문구만 보임"으로 두고, 애니메이션이 될 때만 문구가 바뀌게 한다.
+    base_w = 300 if i == 0 else 0
     typing += f"""
-<clipPath id="tc{i}"><rect x="52" y="214" width="0" height="26">
+<clipPath id="tc{i}"><rect x="52" y="214" width="{base_w}" height="26">
   <animate attributeName="width" values="{vals}" keyTimes="{kt}" dur="{n*3.2}s" repeatCount="indefinite"/>
 </rect></clipPath>"""
-type_texts = "".join(
-    f'<text x="52" y="232" font-size="14.5" class="t" clip-path="url(#tc{i})">{line}</text>'
-    for i, line in enumerate(lines)
-)
+
+
+def _type_text(i, line):
+    a, c = i / n, i / n + (1 / n) * 0.92
+    if i == 0:
+        vis, op = f'values="1;0" keyTimes="0;{c:.4f}"', 1
+    else:
+        vis, op = f'values="0;1;0" keyTimes="0;{a:.4f};{c:.4f}"', 0
+    # clip을 지원하지 않는 렌더러에서도 문구가 겹치지 않도록 opacity로 한 번 더 보이고 숨긴다
+    return (f'<text x="52" y="232" font-size="14.5" class="t" opacity="{op}" clip-path="url(#tc{i})">{line}'
+            f'<animate attributeName="opacity" {vis} calcMode="discrete" dur="{n*3.2}s" repeatCount="indefinite"/></text>')
+
+
+type_texts = "".join(_type_text(i, line) for i, line in enumerate(lines))
 defs = f"""
 <linearGradient id="banner" x1="0" y1="0" x2="1" y2="1">
   <stop offset="0" stop-color="{C['purple']}"/><stop offset="0.55" stop-color="#5B5BD6"/><stop offset="1" stop-color="{C['teal']}"/>
@@ -250,8 +271,8 @@ body = panel(h) + f"""
 <g clip-path="url(#top)">
   <rect x="0" y="0" width="{W}" height="96" fill="url(#banner)"/>
   {wave}
-  <text x="24" y="38" font-size="12" fill="#fff" fill-opacity="0.85" font-weight="600">♪ NOW CODING</text>
-  <text x="24" y="58" font-size="15" fill="#fff" font-weight="700">music_is_life v2.1.1</text>
+  <text x="24" y="28" font-size="12" fill="#fff" fill-opacity="0.85" font-weight="600">♪ NOW CODING</text>
+  <text x="24" y="47" font-size="15" fill="#fff" font-weight="700">{NOW_CODING}</text>
 </g>
 <circle cx="70" cy="104" r="42" fill="{C['surface']}"/>
 <circle cx="70" cy="104" r="37" fill="url(#avatar)"/>
@@ -338,7 +359,7 @@ app_card(
 )
 
 spark = (f'<path d="M26 66 L36 58 L44 62 L52 46 L60 52 L70 34" fill="none" stroke="#fff" stroke-width="3.2" '
-         f'stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="80" stroke-dashoffset="80">'
+         f'stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="80" stroke-dashoffset="0">'
          f'<animate attributeName="stroke-dashoffset" values="80;0;0;80" keyTimes="0;0.45;0.85;1" dur="3.2s" repeatCount="indefinite"/></path>'
          f'<circle cx="70" cy="34" r="3.5" fill="#fff"><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.4;0.45;0.85;1" dur="3.2s" repeatCount="indefinite"/></circle>')
 app_card(

@@ -10,7 +10,7 @@
 <defs><linearGradient id="ig" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#0F9488"/><stop offset="1" stop-color="#0EA5E9"/></linearGradient></defs>
 <rect x="1" y="1" width="418" height="110" rx="20" fill="#FFFFFF" stroke="#D0D7DE" stroke-width="1.5"/>
 <rect x="18" y="22" width="60" height="60" rx="16" fill="url(#ig)"/>
-<path d="M26 66 L36 58 L44 62 L52 46 L60 52 L70 34" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="80" stroke-dashoffset="80"><animate attributeName="stroke-dashoffset" values="80;0;0;80" keyTimes="0;0.45;0.85;1" dur="3.2s" repeatCount="indefinite"/></path><circle cx="70" cy="34" r="3.5" fill="#fff"><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.4;0.45;0.85;1" dur="3.2s" repeatCount="indefinite"/></circle>
+<path d="M26 66 L36 58 L44 62 L52 46 L60 52 L70 34" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="80" stroke-dashoffset="0"><animate attributeName="stroke-dashoffset" values="80;0;0;80" keyTimes="0;0.45;0.85;1" dur="3.2s" repeatCount="indefinite"/></path><circle cx="70" cy="34" r="3.5" fill="#fff"><animate attributeName="opacity" values="0;0;1;1;0" keyTimes="0;0.4;0.45;0.85;1" dur="3.2s" repeatCount="indefinite"/></circle>
 <text x="92" y="36" font-size="17" class="t b">Coin Dashboard</text>
 <rect x="232" y="21" width="67" height="18" rx="9" fill="#15803D" fill-opacity="0.18"/><text x="266" y="34" font-size="11" text-anchor="middle" fill="#15803D" font-weight="700">Web · iOS</text>
 <text x="92" y="58" font-size="13" class="s">업비트 시세를 실시간으로 보는 대시보드</text>
