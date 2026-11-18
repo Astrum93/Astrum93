@@ -433,7 +433,7 @@ body = f"""
   <animate attributeName="opacity" values="0;0;1" keyTimes="0;0.6;1" dur="1s" fill="freeze"/>
   <animateTransform attributeName="transform" type="translate" values="0 24;0 24;0 0" keyTimes="0;0.6;1" dur="1s" fill="freeze"/>
   <rect x="10" y="8" width="{W-20}" height="48" rx="12" fill="#2A2F3D"/>
-  <text x="28" y="38" font-size="14" class="t">🎉 music_is_life v2.1.1 업데이트!</text>
+  <text x="28" y="38" font-size="14" fill="#EEF0F6">🎉 music_is_life v2.1.1 업데이트!</text>
   <text x="{W-30}" y="38" font-size="14" text-anchor="end" fill="{C['purple']}" font-weight="700">개발 일지 ›</text>
 </g>
 """
@@ -600,37 +600,68 @@ body = f"""
 """
 write("card-award.svg", svg(h, body, defs))
 
-# 8. 하단 내비 = 폰 아랫부분 (탭바 + 홈 인디케이터 + 베젤) ---------------------------
+# 8. 하단 내비 = 폰 아랫부분 (플로팅 글래스 탭바 + 홈 인디케이터 + 베젤) -------------------
+# iOS 26 Liquid Glass 스타일: 화면 아래에 떠 있는 반투명 캡슐, 선택 탭은 캡슐 안의 알약으로 채운다.
 # 모바일에서 함께 줄어들도록 한 장(통이미지)으로 만든다.
-NAV_H, HOME_H = 74, 30
-TAB_W = W / 4
+# 그림자는 SVG filter 대신 반투명 사각형을 겹쳐 그린다 (filter를 못 그리는 렌더러 대비).
+GAP_T, CAP_H, GAP_B, HOME_H = 6, 64, 10, 22
+CAP_X = BZ + 14
+CAP_W = WO - CAP_X * 2
+CAP_Y = GAP_T
+TAB_W = CAP_W / 4
+GLASS = (("#FFFFFF", 0.86, "#000000", 0.08, 0.95) if THEME == "light"
+         else ("#1D2230", 0.80, "#FFFFFF", 0.10, 0.22))   # 채움색, 채움 투명도, 테두리색, 테두리 투명도, 윗변 반사
+SHADOW = (0.05, 0.03) if THEME == "light" else (0.10, 0.06)
 tabs = [
-    ("홈", '<path d="M2 9 L10 2 L18 9 V18 H2 Z"/><path d="M8 18 V12 H12 V18"/>'),
-    ("레포", '<rect x="2" y="2" width="16" height="16" rx="3"/><path d="M6 7 H14 M6 10.5 H14 M6 14 H10"/>'),
-    ("개발 일지", '<path d="M3 15 L4 11 L13 2 L16 5 L7 14 Z"/><path d="M3 18.5 H17"/>'),
-    ("포트폴리오", '<rect x="1" y="5" width="18" height="13" rx="3"/><path d="M7 5 V2.5 H13 V5"/><path d="M1 10.5 H19"/>'),
+    ("홈", '<path d="M2 9 L10 2 L18 9 V18 H2 Z"/>', '<path d="M8 18 V12.5 H12 V18"/>'),
+    ("레포", '<rect x="2" y="2" width="16" height="16" rx="3"/><path d="M6 7 H14 M6 10.5 H14 M6 14 H10"/>', ""),
+    ("개발 일지", '<path d="M3 15 L4 11 L13 2 L16 5 L7 14 Z"/><path d="M3 18.5 H17"/>', ""),
+    ("포트폴리오", '<rect x="1" y="5" width="18" height="13" rx="3"/><path d="M7 5 V2.5 H13 V5"/><path d="M1 10.5 H19"/>', ""),
 ]
-H = NAV_H + HOME_H + BZ
+H = GAP_T + CAP_H + GAP_B + HOME_H + BZ
 SB = H - BZ          # 화면 아래 끝
-body = (f'<path d="M0 0 H{WO} V{H-R_OUT} Q{WO} {H} {WO-R_OUT} {H} H{R_OUT} Q0 {H} 0 {H-R_OUT} Z" fill="{BODY}"/>'
+fill, fill_op, line, line_op, shine = GLASS
+r = CAP_H / 2
+body = (f'<defs><linearGradient id="shine" x1="0" y1="0" x2="0" y2="1">'
+        f'<stop offset="0" stop-color="#fff" stop-opacity="{shine}"/><stop offset="0.5" stop-color="#fff" stop-opacity="0"/>'
+        f'</linearGradient></defs>'
+        f'<path d="M0 0 H{WO} V{H-R_OUT} Q{WO} {H} {WO-R_OUT} {H} H{R_OUT} Q0 {H} 0 {H-R_OUT} Z" fill="{BODY}"/>'
         f'<path d="M0.75 0 V{H-R_OUT} Q0.75 {H-0.75} {R_OUT} {H-0.75} H{WO-R_OUT} Q{WO-0.75} {H-0.75} {WO-0.75} {H-R_OUT} V0" '
         f'fill="none" stroke="{EDGE}" stroke-width="1.5"/>'
         f'<path d="M{BZ} 0 H{WO-BZ} V{SB-R_SCR} Q{WO-BZ} {SB} {WO-BZ-R_SCR} {SB} H{BZ+R_SCR} Q{BZ} {SB} {BZ} {SB-R_SCR} Z" '
-        f'fill="{C["surface"]}"/>'
-        f'<line x1="{BZ}" y1="0.5" x2="{WO-BZ}" y2="0.5" stroke="{C["border"]}"/>'
-        # 선택된 탭(홈) 구간 전체를 칠한다
-        f'<rect x="{BZ}" y="1" width="{PADX + TAB_W - BZ}" height="{NAV_H - 1}" fill="{C["purple"]}" fill-opacity="0.24">'
-        f'<animate attributeName="fill-opacity" values="0;0.24" dur="0.4s" fill="freeze"/></rect>')
-for i, (label, icon) in enumerate(tabs):
+        f'fill="{C["bg"]}"/>'
+        # 그림자 (겹친 반투명 캡슐)
+        f'<rect x="{CAP_X+2}" y="{CAP_Y+5}" width="{CAP_W-4}" height="{CAP_H}" rx="{r}" fill="#000" fill-opacity="{SHADOW[0]}"/>'
+        f'<rect x="{CAP_X+5}" y="{CAP_Y+8}" width="{CAP_W-10}" height="{CAP_H-2}" rx="{r-1}" fill="#000" fill-opacity="{SHADOW[1]}"/>'
+        # 유리 캡슐 + 테두리 + 윗변 반사
+        f'<rect x="{CAP_X}" y="{CAP_Y}" width="{CAP_W}" height="{CAP_H}" rx="{r}" fill="{fill}" fill-opacity="{fill_op}" '
+        f'stroke="{line}" stroke-opacity="{line_op}"/>'
+        f'<rect x="{CAP_X+1}" y="{CAP_Y+1}" width="{CAP_W-2}" height="{CAP_H-2}" rx="{r-1}" fill="url(#shine)"/>')
+# 선택된 탭(홈): 탭 칸 전체를 채우는 알약. 기본값이 최종 상태라 애니메이션이 없어도 그대로 보인다.
+PX, PY = CAP_X + 6, CAP_Y + 6
+PW, PH = TAB_W - 4, CAP_H - 12
+body += (f'<rect x="{PX}" y="{PY}" width="{PW}" height="{PH}" rx="{PH/2}" fill="{C["purple"]}" fill-opacity="0.22" '
+         f'stroke="{C["purple"]}" stroke-opacity="0.35">'
+         f'<animate attributeName="width" values="{PH};{PW}" dur="0.45s" fill="freeze"/>'
+         f'<animate attributeName="x" values="{PX + (PW - PH) / 2};{PX}" dur="0.45s" fill="freeze"/></rect>')
+for i, (label, icon, detail) in enumerate(tabs):
     active = i == 0
-    cx = PADX + TAB_W * i + TAB_W / 2
-    icon_color = C["purple"] if active else C["sub"]
-    label_color = C["text"] if active else C["sub"]
-    body += (f'<g transform="translate({cx-10} 16)" fill="none" stroke="{icon_color}" stroke-width="2" '
-             f'stroke-linecap="round" stroke-linejoin="round">{icon}</g>'
-             f'<text x="{cx}" y="58" font-size="12" text-anchor="middle" fill="{label_color}" '
-             f'font-weight="{700 if active else 500}" font-family="{FONT}">{label}</text>')
-body += f'<rect x="{WO/2-67}" y="{NAV_H + HOME_H/2 - 2}" width="134" height="5" rx="2.5" fill="{C["text"]}" fill-opacity="0.85"/>'
+    cx = CAP_X + TAB_W * i + TAB_W / 2
+    if active:
+        # 선택 탭은 채워진 아이콘
+        icon_svg = (f'<g transform="translate({cx-10} {CAP_Y+11})" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+                    f'<g fill="{C["purple"]}" stroke="{C["purple"]}">{icon}</g>'
+                    f'<g fill="none" stroke="{C["surface"]}">{detail}</g></g>')
+        label_color, weight = C["purple"], 700
+    else:
+        icon_svg = (f'<g transform="translate({cx-10} {CAP_Y+11})" fill="none" stroke="{C["sub"]}" stroke-width="2" '
+                    f'stroke-linecap="round" stroke-linejoin="round">{icon}{detail}</g>')
+        label_color, weight = C["sub"], 500
+    body += (icon_svg +
+             f'<text x="{cx}" y="{CAP_Y+50}" font-size="11.5" text-anchor="middle" fill="{label_color}" '
+             f'font-weight="{weight}" font-family="{FONT}">{label}</text>')
+body += (f'<rect x="{WO/2-67}" y="{CAP_Y + CAP_H + GAP_B + HOME_H/2 - 2.5}" width="134" height="5" rx="2.5" '
+         f'fill="{C["text"]}" fill-opacity="0.85"/>')
 _save("nav.svg", _outer(H, body))
 
 print("generated:", sorted(os.listdir(OUT)))
