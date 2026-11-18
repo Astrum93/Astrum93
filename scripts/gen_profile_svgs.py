@@ -8,6 +8,7 @@
 """
 import base64
 import os
+import re
 import sys
 
 OUT = sys.argv[1]
@@ -36,7 +37,7 @@ DARK = {
 }
 # GitHub 라이트 테마(흰 배경)에서 읽히도록 카드는 밝게, 강조색은 한 톤 진하게
 LIGHT = {
-    "bg": "#FFFFFF",
+    "bg": "#F2F4F7",
     "surface": "#FFFFFF",
     "surface2": "#F1F3F7",
     "border": "#D0D7DE",
@@ -113,15 +114,62 @@ def chips(x, y, items, gap=6, max_x=None):
     return "".join(out)
 
 
-def write(name, content):
+def _save(name, content):
     with open(os.path.join(OUT, name), "w", encoding="utf-8") as f:
         f.write(content)
 
 
-# 1. AppBar + 상태바 ---------------------------------------------------------
-h = 118
-body = panel(h, 28) + f"""
-<rect x="160" y="12" width="100" height="28" rx="14" fill="#000"/>
+# --- 폰 프레임 ------------------------------------------------------------------
+# README에서 모든 조각을 <br>로 이어 붙이고 img에 align="top"을 주면 조각 사이 틈이 0이 된다.
+# 그래서 각 조각이 폰 몸체(베젤)와 화면 배경을 함께 그리면, 이어 붙였을 때 폰 한 대가 된다.
+# 폰 몸체: 라이트 테마는 검정 폰, 다크 테마는 GitHub 다크 배경(#0d1117)과 구분되도록 티타늄 그레이
+BODY, EDGE = ("#111318", "#2B2F38") if THEME == "light" else ("#252A35", "#4A5163")
+BZ = 10                               # 베젤 두께
+PADX = BZ + 12                        # 화면 안쪽 여백까지 포함한 카드 시작 x
+WO = W + PADX * 2                     # 폰 전체 폭 (464)
+R_OUT, R_SCR = 56, 46                 # 바깥 / 화면 모서리 반경
+
+
+def _inner(content, x, y):
+    m = re.match(r'<svg xmlns="http://www.w3.org/2000/svg" width="(\d+)" height="([\d.]+)" viewBox="0 0 \d+ [\d.]+">', content)
+    h = float(m.group(2))
+    return content.replace(m.group(0), f'<svg x="{x}" y="{y}" width="{W}" height="{h:g}" viewBox="0 0 {W} {h:g}">', 1), h
+
+
+def _outer(H, body):
+    return (f'<svg xmlns="http://www.w3.org/2000/svg" width="{WO}" height="{H:g}" viewBox="0 0 {WO} {H:g}">'
+            f'{body}</svg>\n')
+
+
+def frame(content, kind="mid", pad=(6, 6)):
+    """카드 SVG를 폰 화면 한 줄로 감싼다. kind: top(폰 윗부분) / mid."""
+    if kind == "top":
+        pt, pb = BZ + 2, pad[1]
+        inner, h = _inner(content, PADX, pt)
+        H = pt + h + pb
+        shell = (f'<path d="M0 {H} V{R_OUT} Q0 0 {R_OUT} 0 H{WO-R_OUT} Q{WO} 0 {WO} {R_OUT} V{H} Z" fill="{BODY}"/>'
+                 f'<path d="M0.75 {H} V{R_OUT} Q0.75 0.75 {R_OUT} 0.75 H{WO-R_OUT} Q{WO-0.75} 0.75 {WO-0.75} {R_OUT} V{H}" '
+                 f'fill="none" stroke="{EDGE}" stroke-width="1.5"/>'
+                 f'<path d="M{BZ} {H} V{BZ+R_SCR} Q{BZ} {BZ} {BZ+R_SCR} {BZ} H{WO-BZ-R_SCR} Q{WO-BZ} {BZ} {WO-BZ} {BZ+R_SCR} V{H} Z" '
+                 f'fill="{C["bg"]}"/>')
+    else:
+        pt, pb = pad
+        inner, h = _inner(content, PADX, pt)
+        H = pt + h + pb
+        shell = (f'<rect width="{WO}" height="{H}" fill="{BODY}"/>'
+                 f'<path d="M0.75 0 V{H} M{WO-0.75} 0 V{H}" stroke="{EDGE}" stroke-width="1.5"/>'
+                 f'<rect x="{BZ}" width="{WO-2*BZ}" height="{H}" fill="{C["bg"]}"/>')
+    return _outer(H, shell + inner)
+
+
+def write(name, content, kind="mid", pad=(6, 6)):
+    _save(name, frame(content, kind, pad))
+
+
+# 1. AppBar + 상태바 (폰 윗부분) ----------------------------------------------
+h = 108
+body = f"""
+<rect x="160" y="6" width="100" height="30" rx="15" fill="#000"/>
 <text x="34" y="32" font-size="15" class="t b">9:41</text>
 <g fill="{C['text']}">
   <rect x="318" y="26" width="3" height="6" rx="1"/><rect x="323" y="23" width="3" height="9" rx="1"/>
@@ -146,7 +194,7 @@ body = panel(h, 28) + f"""
   <animate attributeName="r" values="4.5;6;4.5" dur="1.6s" repeatCount="indefinite"/>
 </circle>
 """
-write("appbar.svg", svg(h, body))
+write("appbar.svg", svg(h, body), kind="top")
 
 # 2. 프로필 -----------------------------------------------------------------
 h = 300
@@ -365,7 +413,7 @@ body = f"""
   <animateTransform attributeName="transform" type="translate" values="0 24;0 24;0 0" keyTimes="0;0.6;1" dur="1s" fill="freeze"/>
   <rect x="10" y="8" width="{W-20}" height="48" rx="12" fill="#2A2F3D"/>
   <text x="28" y="38" font-size="14" class="t">🎉 music_is_life v2.1.1 업데이트!</text>
-  <text x="{W-30}" y="38" font-size="14" text-anchor="end" fill="{C['purple']}" font-weight="700">릴리스 보기</text>
+  <text x="{W-30}" y="38" font-size="14" text-anchor="end" fill="{C['purple']}" font-weight="700">개발 일지 ›</text>
 </g>
 """
 write("snackbar.svg", svg(h, body))
@@ -421,9 +469,10 @@ for i, (emoji, title, sub, color) in enumerate(works):
              f'<text x="66" y="{y+45}" font-size="11.8" class="s">{sub}</text>')
 write("card-work.svg", svg(h, body))
 
-# 7-2b. 스토어 링크 위젯 (한 줄을 3조각으로 잘라 조각마다 링크) --------------------
+# 7-2b. 스토어 링크 = iOS 설정 화면 같은 목록 카드 --------------------------------
+# 모바일에서도 깨지지 않도록 가로로 자르지 않고, 링크 하나당 한 줄(통이미지)로 만든다.
+# 줄 사이 틈이 0이라 위·아래 줄이 이어져 하나의 카드처럼 보인다.
 STORE_DIR = sys.argv[3]
-SLICES = [("info", 0, 252), ("ios", 252, 84), ("play", 336, 84)]
 
 
 def b64png(path):
@@ -431,41 +480,59 @@ def b64png(path):
         return "data:image/png;base64," + base64.b64encode(f.read()).decode()
 
 
-def store_row(prefix, icon_file, name, sub, first=False, last=False):
-    h = 84
-    # 위/아래 줄이 붙어 하나의 카드처럼 보이도록, 첫 줄은 위쪽만, 마지막 줄은 아래쪽만 둥글게
-    top_r = 20 if first else 0
-    bot_r = 20 if last else 0
-    x0, x1, y0, y1 = 1, W - 1, 1 if first else 0, h - 1 if last else h
-    shape = (f'M{x0 + top_r} {y0} H{x1 - top_r} Q{x1} {y0} {x1} {y0 + top_r} V{y1 - bot_r} Q{x1} {y1} {x1 - bot_r} {y1} '
-             f'H{x0 + bot_r} Q{x0} {y1} {x0} {y1 - bot_r} V{y0 + top_r} Q{x0} {y0} {x0 + top_r} {y0} Z')
-    sep = "" if first else f'<line x1="16" y1="0.5" x2="{W-16}" y2="0.5" stroke="{C["border"]}"/>'
-    defs = f'<clipPath id="ic"><rect x="16" y="14" width="56" height="56" rx="14"/></clipPath>'
-    btn = ""
-    for i, (glyph, label, color) in enumerate([
-        (f'<path d="M-7 6 L0 -7 L7 6 M-4.5 1.5 H4.5 M-9 6 H-4 M4 6 H9" fill="none" stroke="{C["blue"]}" '
-         f'stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>', "App Store", C["blue"]),
-        (f'<path d="M-6 -8 L8 0 L-6 8 Z" fill="none" stroke="{C["green"]}" stroke-width="2.2" stroke-linejoin="round"/>',
-         "Google Play", C["green"]),
-    ]):
-        cx = 252 + 84 * i + 42
-        btn += (f'<rect x="{cx-34}" y="14" width="68" height="56" rx="14" fill="{color}" fill-opacity="0.12"/>'
-                f'<g transform="translate({cx} 34)">{glyph}</g>'
-                f'<text x="{cx}" y="60" font-size="10.5" text-anchor="middle" fill="{color}" font-weight="700">{label}</text>')
-    body = (f'<path d="{shape}" fill="{C["surface"]}" stroke="{C["border"]}" stroke-width="1.5"/>{sep}'
-            f'<image x="16" y="14" width="56" height="56" clip-path="url(#ic)" href="{b64png(os.path.join(STORE_DIR, icon_file))}"/>'
-            f'<rect x="16" y="14" width="56" height="56" rx="14" fill="none" stroke="#fff" stroke-opacity="0.08"/>'
-            f'<text x="86" y="38" font-size="15.5" class="t b">{name}</text>'
-            f'<text x="86" y="59" font-size="12" class="s">{sub}</text>{btn}')
-    full = svg(h, body, defs)
-    for key, x, w in SLICES:
-        s = full.replace(f'width="{W}" height="{h}" viewBox="0 0 {W} {h}"',
-                         f'width="{w}" height="{h}" viewBox="{x} 0 {w} {h}"')
-        write(f"{prefix}-{key}.svg", s)
+def list_shape(h, first, last, r=20):
+    """목록 카드의 한 줄: 첫 줄은 위쪽만, 마지막 줄은 아래쪽만 둥글게."""
+    x0, x1 = 1, W - 1
+    y0, y1 = (1 if first else 0), (h - 1 if last else h)
+    tr, br = (r if first else 0), (r if last else 0)
+    fill = (f'M{x0 + tr} {y0} H{x1 - tr} Q{x1} {y0} {x1} {y0 + tr} V{y1 - br} Q{x1} {y1} {x1 - br} {y1} '
+            f'H{x0 + br} Q{x0} {y1} {x0} {y1 - br} V{y0 + tr} Q{x0} {y0} {x0 + tr} {y0} Z')
+    # 테두리는 옆선 + (첫 줄이면 윗선, 마지막 줄이면 아랫선)만 그려 줄 사이에 선이 겹치지 않게 한다
+    edge = (f'M{x0} {h if not last else y1 - br} V{y0 + tr}' + (f' Q{x0} {y0} {x0 + tr} {y0} H{x1 - tr} Q{x1} {y0} {x1} {y0 + tr}' if first else f' M{x1} {y0}')
+            + f' V{y1 - br}' + (f' Q{x1} {y1} {x1 - br} {y1} H{x0 + br} Q{x0} {y1} {x0} {y1 - br}' if last else f' V{h}'))
+    return (f'<path d="{fill}" fill="{C["surface"]}"/>'
+            f'<path d="{edge}" fill="none" stroke="{C["border"]}" stroke-width="1.5"/>')
 
 
-store_row("store-user", "user.png", "써젯", "유저앱 · 타임딜 구매", first=True, last=True)
-store_row("store-partner", "partner.png", "써젯 사장님용", "점주앱 · 티켓 확인 · 정산", first=True, last=True)
+def store_head():
+    h = 52
+    body = (list_shape(h, True, False) +
+            f'<text x="20" y="34" font-size="15.5" class="t b">📲 스토어에서 만나보기</text>'
+            f'<text x="{W-20}" y="34" font-size="12" text-anchor="end" class="f">Endeavor Inc.</text>')
+    write("store-head.svg", svg(h, body), pad=(6, 0))
+
+
+STORE_GLYPH = {
+    "ios": ("App Store", "blue",
+            '<path d="M-7 6 L0 -7 L7 6 M-4.5 1.5 H4.5 M-9 6 H-4 M4 6 H9" fill="none" stroke-width="2.2" '
+            'stroke-linecap="round" stroke-linejoin="round"/>'),
+    "play": ("Google Play", "green",
+             '<path d="M-6 -8 L8 0 L-6 8 Z" fill="none" stroke-width="2.2" stroke-linejoin="round"/>'),
+}
+
+
+def store_item(name, icon_file, app, sub, store, last=False):
+    h = 64
+    label, color_key, glyph = STORE_GLYPH[store]
+    color = C[color_key]
+    defs = f'<clipPath id="ic"><rect x="20" y="12" width="40" height="40" rx="10"/></clipPath>'
+    body = (list_shape(h, False, last) +
+            f'<line x1="74" y1="0.5" x2="{W-1}" y2="0.5" stroke="{C["border"]}"/>'
+            f'<image x="20" y="12" width="40" height="40" clip-path="url(#ic)" href="{b64png(os.path.join(STORE_DIR, icon_file))}"/>'
+            f'<text x="74" y="29" font-size="14.5" class="t b">{app}</text>'
+            f'<text x="74" y="48" font-size="12" class="s">{sub}</text>'
+            f'<rect x="{W-150}" y="16" width="112" height="32" rx="16" fill="{color}" fill-opacity="0.14"/>'
+            f'<g transform="translate({W-130} 32) scale(0.8)" stroke="{color}">{glyph}</g>'
+            f'<text x="{W-117}" y="36.5" font-size="12" fill="{color}" font-weight="700">{label}</text>'
+            f'<path d="M{W-24} 26 l6 6 l-6 6" fill="none" stroke="{C["faint"]}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>')
+    write(name, svg(h, body, defs), pad=(0, 6 if last else 0))
+
+
+store_head()
+store_item("store-user-ios.svg", "user.png", "써젯", "유저앱 · 타임딜 구매", "ios")
+store_item("store-user-play.svg", "user.png", "써젯", "유저앱 · 타임딜 구매", "play")
+store_item("store-partner-ios.svg", "partner.png", "써젯 사장님용", "점주앱 · 티켓 확인 · 정산", "ios")
+store_item("store-partner-play.svg", "partner.png", "써젯 사장님용", "점주앱 · 티켓 확인 · 정산", "play", last=True)
 
 # 7-3. 정보처리기사 위젯 --------------------------------------------------------
 h = 120
@@ -512,40 +579,37 @@ body = f"""
 """
 write("card-award.svg", svg(h, body, defs))
 
-# 8. 하단 내비 (4조각이 이어져 하나의 바처럼 보이게) ---------------------------
-# 각 조각은 420px 전체 바를 그린 뒤 자기 구간(105px)만 보여준다 → 이음새 없이 연결됨.
-NAV_W, NAV_H, NAV_N = W // 4, 76, 4
-
-
-def nav(name, index, label, icon, active=False):
-    w, h = NAV_W, NAV_H
-    cx = w / 2
-    bar = (f'<g transform="translate({-index * w} 0)">'
-           f'<rect x="1" y="1" width="{W-2}" height="{h-2}" rx="22" fill="{C["surface"]}" '
-           f'stroke="{C["border"]}" stroke-width="1.5"/></g>')
-    defs = ""
-    if active:
-        # 버튼 구간 전체를 칠한다. 바 모양으로 잘라서 바깥 모서리 곡선은 그대로 유지.
-        defs = (f'<clipPath id="barClip"><rect x="{1 - index * w}" y="1" width="{W-2}" height="{h-2}" rx="22"/></clipPath>')
-        indicator = (f'<rect x="0" y="0" width="{w}" height="{h}" fill="{C["purple"]}" fill-opacity="0.26" clip-path="url(#barClip)">'
-                     f'<animate attributeName="fill-opacity" values="0;0.26" dur="0.4s" fill="freeze"/></rect>')
-        icon_color, label_color, weight = C["purple"], C["text"], 700
-    else:
-        indicator, icon_color, label_color, weight = "", C["sub"], C["sub"], 500
-    body = (f'{bar}{indicator}'
-            f'<g transform="translate({cx-10} 17)" fill="none" stroke="{icon_color}" stroke-width="2" '
-            f'stroke-linecap="round" stroke-linejoin="round">{icon}</g>'
-            f'<text x="{cx}" y="62" font-size="12" text-anchor="middle" fill="{label_color}" '
-            f'font-weight="{weight}">{label}</text>')
-    s = svg(h, body, defs).replace(f'width="{W}" height="{h}" viewBox="0 0 {W} {h}"',
-                                   f'width="{w}" height="{h}" viewBox="0 0 {w} {h}"')
-    write(name, s)
-
-
-# 아이콘은 20x20 박스 기준
-nav("nav-home.svg", 0, "홈", '<path d="M2 9 L10 2 L18 9 V18 H2 Z"/><path d="M8 18 V12 H12 V18"/>', active=True)
-nav("nav-repos.svg", 1, "레포", '<rect x="2" y="2" width="16" height="16" rx="3"/><path d="M6 7 H14 M6 10.5 H14 M6 14 H10"/>')
-nav("nav-devlog.svg", 2, "개발 일지", '<path d="M3 15 L4 11 L13 2 L16 5 L7 14 Z"/><path d="M3 18.5 H17"/>')
-nav("nav-notion.svg", 3, "포트폴리오", '<rect x="1" y="5" width="18" height="13" rx="3"/><path d="M7 5 V2.5 H13 V5"/><path d="M1 10.5 H19"/>')
+# 8. 하단 내비 = 폰 아랫부분 (탭바 + 홈 인디케이터 + 베젤) ---------------------------
+# 모바일에서 함께 줄어들도록 한 장(통이미지)으로 만든다.
+NAV_H, HOME_H = 74, 30
+TAB_W = W / 4
+tabs = [
+    ("홈", '<path d="M2 9 L10 2 L18 9 V18 H2 Z"/><path d="M8 18 V12 H12 V18"/>'),
+    ("레포", '<rect x="2" y="2" width="16" height="16" rx="3"/><path d="M6 7 H14 M6 10.5 H14 M6 14 H10"/>'),
+    ("개발 일지", '<path d="M3 15 L4 11 L13 2 L16 5 L7 14 Z"/><path d="M3 18.5 H17"/>'),
+    ("포트폴리오", '<rect x="1" y="5" width="18" height="13" rx="3"/><path d="M7 5 V2.5 H13 V5"/><path d="M1 10.5 H19"/>'),
+]
+H = NAV_H + HOME_H + BZ
+SB = H - BZ          # 화면 아래 끝
+body = (f'<path d="M0 0 H{WO} V{H-R_OUT} Q{WO} {H} {WO-R_OUT} {H} H{R_OUT} Q0 {H} 0 {H-R_OUT} Z" fill="{BODY}"/>'
+        f'<path d="M0.75 0 V{H-R_OUT} Q0.75 {H-0.75} {R_OUT} {H-0.75} H{WO-R_OUT} Q{WO-0.75} {H-0.75} {WO-0.75} {H-R_OUT} V0" '
+        f'fill="none" stroke="{EDGE}" stroke-width="1.5"/>'
+        f'<path d="M{BZ} 0 H{WO-BZ} V{SB-R_SCR} Q{WO-BZ} {SB} {WO-BZ-R_SCR} {SB} H{BZ+R_SCR} Q{BZ} {SB} {BZ} {SB-R_SCR} Z" '
+        f'fill="{C["surface"]}"/>'
+        f'<line x1="{BZ}" y1="0.5" x2="{WO-BZ}" y2="0.5" stroke="{C["border"]}"/>'
+        # 선택된 탭(홈) 구간 전체를 칠한다
+        f'<rect x="{BZ}" y="1" width="{PADX + TAB_W - BZ}" height="{NAV_H - 1}" fill="{C["purple"]}" fill-opacity="0.24">'
+        f'<animate attributeName="fill-opacity" values="0;0.24" dur="0.4s" fill="freeze"/></rect>')
+for i, (label, icon) in enumerate(tabs):
+    active = i == 0
+    cx = PADX + TAB_W * i + TAB_W / 2
+    icon_color = C["purple"] if active else C["sub"]
+    label_color = C["text"] if active else C["sub"]
+    body += (f'<g transform="translate({cx-10} 16)" fill="none" stroke="{icon_color}" stroke-width="2" '
+             f'stroke-linecap="round" stroke-linejoin="round">{icon}</g>'
+             f'<text x="{cx}" y="58" font-size="12" text-anchor="middle" fill="{label_color}" '
+             f'font-weight="{700 if active else 500}" font-family="{FONT}">{label}</text>')
+body += f'<rect x="{WO/2-67}" y="{NAV_H + HOME_H/2 - 2}" width="134" height="5" rx="2.5" fill="{C["text"]}" fill-opacity="0.85"/>'
+_save("nav.svg", _outer(H, body))
 
 print("generated:", sorted(os.listdir(OUT)))
