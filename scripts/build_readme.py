@@ -4,8 +4,13 @@
 폰 한 대처럼 보이게 하고, GitHub가 이미지마다 거는 max-width:100% 덕분에 모바일에서도 폰 전체가
 같은 비율로 줄어든다. <picture>로 GitHub 라이트/다크 테마에 맞는 세트(assets / assets/light)를 고른다.
 
+이미지 주소에는 파일 내용 해시를 ?v= 로 붙인다. GitHub CDN·브라우저·GitHub 앱이 같은 주소의 이미지를
+캐시하므로, 내용이 바뀔 때마다 주소가 달라져야 웹과 앱 모두 곧바로 새 디자인을 받아간다.
+SVG를 다시 만들었으면 이 스크립트도 다시 실행해야 한다.
+
 사용법: python3 scripts/build_readme.py  (저장소 루트에서 실행)
 """
+import hashlib
 GH = "https://github.com/Astrum93"
 NOTION = "https://astrum93.notion.site/4cafb9bffadd41aab36297dd738f9e13"
 MIL = f"{GH}/music_is_life"
@@ -40,10 +45,15 @@ ROWS = [
 ]
 
 
+def versioned(path):
+    with open(path, "rb") as f:
+        return f"{path}?v={hashlib.sha1(f.read()).hexdigest()[:8]}"
+
+
 def row(asset, href, alt):
     return (f'<a href="{href}"><picture>'
-            f'<source media="(prefers-color-scheme: light)" srcset="assets/light/{asset}.svg" />'
-            f'<img src="assets/{asset}.svg" width="{WIDTH}" align="top" alt="{alt}" />'
+            f'<source media="(prefers-color-scheme: light)" srcset="{versioned(f"assets/light/{asset}.svg")}" />'
+            f'<img src="{versioned(f"assets/{asset}.svg")}" width="{WIDTH}" align="top" alt="{alt}" />'
             f'</picture></a>')
 
 

@@ -25,6 +25,7 @@ jobs:
         run: |
           python3 scripts/gen_profile_svgs.py assets scripts/src/avatar.png scripts/src dark
           python3 scripts/gen_profile_svgs.py assets/light scripts/src/avatar.png scripts/src light
+          python3 scripts/build_readme.py
 
       - name: Commit if changed
         run: |
@@ -34,6 +35,6 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add scripts/src/now_coding.txt assets
+          git add scripts/src/now_coding.txt assets README.md
           git commit -m "[auto] NOW CODING: $(cat scripts/src/now_coding.txt)"
           git push
